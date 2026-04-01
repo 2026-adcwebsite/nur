@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Restorant ADC — Kuzhinë Shqiptare</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --warm-white: #faf7f2;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --dark: #1a1208;
+    --brown: #4a2c0a;
+    --brown-light: #7a4f1f;
+    --text: #2d1f0e;
+    --text-light: #6b4f2a;
+    --border: rgba(201,168,76,0.3);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family:'Lato',sans-serif; background:var(--warm-white); color:var(--text); overflow-x:hidden; }
+
+  /* NAV */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:1000;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 5%; height:72px;
+    background:rgba(26,18,8,0.96); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-logo { font-family:'Cinzel',serif; font-size:1.3rem; color:var(--gold); letter-spacing:3px; cursor:pointer; }
+  .nav-links { display:flex; gap:2.5rem; list-style:none; }
+  .nav-links a { font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:2px; color:var(--cream); text-decoration:none; text-transform:uppercase; transition:color 0.3s; cursor:pointer; }
+  .nav-links a:hover { color:var(--gold); }
+  .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:5px; }
+  .hamburger span { display:block; width:26px; height:2px; background:var(--cream); transition:all 0.3s; }
+  .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity:0; }
+  .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+  .mobile-menu { display:none; position:fixed; top:72px; left:0; right:0; background:rgba(26,18,8,0.98); backdrop-filter:blur(15px); padding:2rem; z-index:999; border-bottom:1px solid var(--border); flex-direction:column; gap:1.5rem; }
+  .mobile-menu a { font-family:'Cinzel',serif; font-size:0.9rem; letter-spacing:3px; color:var(--cream); text-decoration:none; text-transform:uppercase; text-align:center; padding:0.8rem; border-bottom:1px solid var(--border); transition:color 0.3s; cursor:pointer; }
+  .mobile-menu a:hover { color:var(--gold); }
+  .mobile-menu.open { display:flex; }
+
+  /* PAGES */
+  .page { display:none; min-height:100vh; }
+  .page.active { display:block; }
+
+  /* HERO */
+  #home-hero { position:relative; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .hero-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
+  .hero-overlay { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(26,18,8,0.5) 0%, rgba(26,18,8,0.65) 60%, rgba(26,18,8,0.9) 100%); }
+  .hero-content { position:relative; text-align:center; padding:2rem; animation:heroIn 1.2s ease forwards; }
+  @keyframes heroIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+  .hero-ornament { font-size:1.1rem; color:var(--gold); letter-spacing:8px; margin-bottom:1.5rem; display:block; }
+  .hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(3.5rem,8vw,7rem); font-weight:300; color:var(--cream); line-height:1; letter-spacing:2px; }
+  .hero-title em { font-style:italic; color:var(--gold); }
+  .hero-subtitle { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:5px; color:rgba(245,240,232,0.65); text-transform:uppercase; margin:1.5rem 0 2.5rem; }
+  .hero-divider { width:70px; height:1px; background:var(--gold); margin:0 auto 2rem; position:relative; }
+  .hero-divider::before,.hero-divider::after { content:''; position:absolute; top:-3px; width:7px; height:7px; background:var(--gold); border-radius:50%; }
+  .hero-divider::before { left:-8px; } .hero-divider::after { right:-8px; }
+
+  /* BUTTONS */
+  .btn-primary { display:inline-block; font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; color:var(--dark); background:var(--gold); padding:1rem 2.5rem; border:none; cursor:pointer; text-decoration:none; transition:all 0.3s; margin:0 0.4rem 0.5rem; }
+  .btn-primary:hover { background:var(--gold-light); transform:translateY(-2px); box-shadow:0 8px 25px rgba(201,168,76,0.35); }
+  .btn-outline { display:inline-block; font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold); background:transparent; padding:1rem 2.5rem; border:1px solid var(--gold); cursor:pointer; text-decoration:none; transition:all 0.3s; margin:0 0.4rem 0.5rem; }
+  .btn-outline:hover { background:rgba(201,168,76,0.1); transform:translateY(-2px); }
+
+  /* LABELS */
+  .section-label { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:5px; color:var(--gold); text-transform:uppercase; text-align:center; margin-bottom:0.8rem; }
+  .section-title { font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,4vw,3.2rem); font-weight:300; color:var(--brown); text-align:center; line-height:1.2; }
+  .gold-rule { width:55px; height:2px; background:var(--gold); margin:1.5rem auto; }
+
+  /* ABOUT STRIP */
+  .about-strip { display:grid; grid-template-columns:1fr 1fr; min-height:520px; }
+  .about-img-wrap { overflow:hidden; }
+  .about-img-wrap img { width:100%; height:100%; object-fit:cover; transition:transform 0.8s; }
+  .about-img-wrap:hover img { transform:scale(1.05); }
+  .about-text { background:var(--cream); padding:5rem 4rem; display:flex; flex-direction:column; justify-content:center; }
+  .about-text .section-label,.about-text .section-title { text-align:left; }
+  .about-text .gold-rule { margin-left:0; }
+  .about-text p { font-size:0.95rem; color:var(--text-light); line-height:1.9; margin-top:1.2rem; }
+
+  /* FOOD GRID */
+  .food-grid-section { background:var(--dark); padding:5rem 5%; }
+  .food-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-top:3rem; }
+  .food-cell { position:relative; overflow:hidden; aspect-ratio:1; cursor:pointer; }
+  .food-cell img { width:100%; height:100%; object-fit:cover; transition:transform 0.6s; display:block; }
+  .food-cell:hover img { transform:scale(1.08); }
+  .food-cell-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(26,18,8,0.85) 0%,transparent 60%); display:flex; align-items:flex-end; padding:1.2rem; }
+  .food-cell-label { font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--cream); font-size:1.05rem; }
+
+  /* QUOTE */
+  .quote-banner { background:var(--brown); padding:5rem 5%; text-align:center; position:relative; overflow:hidden; }
+  .quote-banner::before { content:'"'; position:absolute; top:-40px; left:3%; font-family:'Cormorant Garamond',serif; font-size:18rem; color:rgba(255,255,255,0.05); line-height:1; }
+  .quote-text { font-family:'Cormorant Garamond',serif; font-size:clamp(1.4rem,2.5vw,2.2rem); font-style:italic; color:var(--cream); max-width:650px; margin:0 auto 1.2rem; line-height:1.6; position:relative; }
+  .quote-author { font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:4px; color:var(--gold-light); text-transform:uppercase; }
+
+  /* HOURS */
+  .hours-section { background:var(--cream); padding:5rem 5%; text-align:center; }
+  .hours-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:2rem; max-width:700px; margin:3rem auto 0; }
+  .hours-card { padding:2rem; border:1px solid var(--border); background:var(--warm-white); }
+  .hours-day { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:3px; color:var(--gold); text-transform:uppercase; margin-bottom:0.8rem; }
+  .hours-time { font-family:'Cormorant Garamond',serif; font-size:1.6rem; color:var(--brown); }
+
+  /* PAGE HERO */
+  .page-hero { background:var(--dark); padding:5rem 5% 4rem; text-align:center; position:relative; overflow:hidden; }
+  .page-hero-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.25; }
+  .page-hero-content { position:relative; }
+  .page-hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(2.5rem,5vw,4.5rem); color:var(--cream); font-weight:300; margin-bottom:0.5rem; }
+  .page-hero-sub { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:5px; color:rgba(201,168,76,0.8); text-transform:uppercase; margin-bottom:0.8rem; }
+  .page-hero::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+
+  /* MENU */
+  #menu { padding-top:72px; background:var(--warm-white); }
+  .menu-tabs { display:flex; justify-content:center; flex-wrap:wrap; border-bottom:1px solid var(--border); padding:3rem 5% 0; }
+  .menu-tab { font-family:'Cinzel',serif; font-size:0.63rem; letter-spacing:3px; text-transform:uppercase; padding:1rem 1.8rem; border:none; background:transparent; color:var(--text-light); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.3s; }
+  .menu-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+  .menu-tab:hover { color:var(--brown); }
+  .menu-section { display:none; padding:4rem 5%; max-width:900px; margin:0 auto; }
+  .menu-section.active { display:block; }
+  .menu-category-title { font-family:'Cormorant Garamond',serif; font-size:0.68rem; letter-spacing:5px; color:var(--gold); text-transform:uppercase; text-align:center; margin-bottom:2.5rem; }
+  .menu-featured { display:grid; grid-template-columns:1fr 1fr; gap:0; margin-bottom:2.5rem; border:1px solid var(--border); overflow:hidden; }
+  .menu-featured-img { overflow:hidden; min-height:240px; }
+  .menu-featured-img img { width:100%; height:100%; object-fit:cover; transition:transform 0.6s; }
+  .menu-featured:hover .menu-featured-img img { transform:scale(1.05); }
+  .menu-featured-text { padding:2.5rem; display:flex; flex-direction:column; justify-content:center; background:var(--cream); }
+  .menu-featured-text h3 { font-family:'Cormorant Garamond',serif; font-size:1.8rem; color:var(--brown); margin-bottom:0.8rem; }
+  .menu-featured-text p { font-size:0.9rem; color:var(--text-light); line-height:1.8; margin-bottom:1.2rem; }
+  .menu-featured-text .price { font-family:'Cormorant Garamond',serif; font-size:1.5rem; color:var(--gold); }
+  .menu-item { display:flex; justify-content:space-between; align-items:flex-start; padding:1.8rem 0; border-bottom:1px solid rgba(201,168,76,0.15); gap:1.5rem; transition:padding 0.3s; }
+  .menu-item:hover { padding-left:0.5rem; }
+  .menu-item-info h4 { font-family:'Cormorant Garamond',serif; font-size:1.25rem; color:var(--brown); margin-bottom:0.4rem; }
+  .menu-item-info p { font-size:0.85rem; color:var(--text-light); line-height:1.65; max-width:460px; }
+  .menu-item-price { font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:var(--gold); font-weight:600; white-space:nowrap; flex-shrink:0; }
+
+  /* GALERIA */
+  #galeria { padding-top:72px; background:var(--dark); }
+  .gallery-masonry { columns:3; column-gap:4px; padding:3rem 3%; background:var(--dark); }
+  .gallery-item { break-inside:avoid; margin-bottom:4px; position:relative; overflow:hidden; cursor:pointer; display:block; }
+  .gallery-item img { width:100%; display:block; transition:transform 0.6s; }
+  .gallery-item:hover img { transform:scale(1.05); }
+  .gallery-overlay { position:absolute; inset:0; background:rgba(26,18,8,0); display:flex; align-items:flex-end; padding:1.2rem; transition:background 0.4s; }
+  .gallery-item:hover .gallery-overlay { background:rgba(26,18,8,0.5); }
+  .gallery-caption { font-family:'Cormorant Garamond',serif; font-size:1rem; font-style:italic; color:var(--cream); opacity:0; transform:translateY(8px); transition:all 0.4s; }
+  .gallery-item:hover .gallery-caption { opacity:1; transform:translateY(0); }
+
+  /* REZERVIM */
+  #rezervim { padding-top:72px; background:var(--cream); }
+  .rezervim-wrap { max-width:650px; margin:0 auto; padding:4rem 5%; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+  .form-group { margin-bottom:1.8rem; }
+  .form-group label { display:block; font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:3px; text-transform:uppercase; color:var(--brown-light); margin-bottom:0.6rem; }
+  .form-group input,.form-group select,.form-group textarea { width:100%; padding:0.9rem 1.2rem; background:var(--warm-white); border:1px solid rgba(74,44,10,0.2); border-bottom:2px solid rgba(201,168,76,0.4); font-family:'Lato',sans-serif; font-size:0.9rem; color:var(--text); outline:none; transition:all 0.3s; appearance:none; }
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus { border-bottom-color:var(--gold); background:white; box-shadow:0 4px 15px rgba(201,168,76,0.1); }
+  .form-group textarea { height:120px; resize:vertical; }
+  .form-submit { width:100%; padding:1.2rem; background:var(--brown); color:var(--gold); font-family:'Cinzel',serif; font-size:0.73rem; letter-spacing:4px; text-transform:uppercase; border:none; cursor:pointer; transition:all 0.3s; }
+  .form-submit:hover { background:var(--dark); transform:translateY(-2px); box-shadow:0 10px 30px rgba(26,18,8,0.3); }
+  .success-msg { display:none; background:rgba(201,168,76,0.1); border:1px solid var(--gold); padding:1.5rem; text-align:center; margin-top:1.5rem; font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:var(--brown); }
+
+  /* KONTAKT */
+  #kontakt { padding-top:72px; background:var(--warm-white); }
+  .kontakt-grid { display:grid; grid-template-columns:1fr 1fr; min-height:calc(100vh - 200px); }
+  .kontakt-info { background:var(--dark); padding:5rem 4rem; display:flex; flex-direction:column; justify-content:center; }
+  .kontakt-info .section-label,.kontakt-info .section-title { text-align:left; }
+  .kontakt-info .section-title { color:var(--cream); }
+  .kontakt-info .gold-rule { margin-left:0; }
+  .info-items { margin-top:3rem; display:flex; flex-direction:column; gap:2rem; }
+  .info-item { display:flex; gap:1.2rem; align-items:flex-start; }
+  .info-icon { font-size:1.3rem; flex-shrink:0; margin-top:2px; }
+  .info-item h4 { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:3px; color:var(--gold); text-transform:uppercase; margin-bottom:0.4rem; }
+  .info-item p { font-size:0.95rem; color:rgba(245,240,232,0.7); line-height:1.7; }
+  .social-links { display:flex; gap:1rem; margin-top:3rem; }
+  .social-link { width:44px; height:44px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--gold); text-decoration:none; font-size:0.9rem; transition:all 0.3s; font-family:'Cinzel',serif; font-weight:600; }
+  .social-link:hover { background:var(--gold); color:var(--dark); }
+  .kontakt-map-side { position:relative; overflow:hidden; }
+  .kontakt-map-side img { width:100%; height:100%; object-fit:cover; min-height:400px; }
+  .map-overlay { position:absolute; inset:0; background:rgba(26,18,8,0.45); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.5rem; text-align:center; padding:2rem; }
+  .map-title { font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--cream); font-style:italic; }
+  .map-addr { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:3px; color:var(--gold); text-transform:uppercase; }
+
+  /* FOOTER */
+  footer { background:var(--dark); border-top:1px solid var(--border); padding:3rem 5%; text-align:center; }
+  .footer-logo { font-family:'Cinzel',serif; font-size:1.2rem; color:var(--gold); letter-spacing:4px; margin-bottom:1rem; }
+  .footer-tagline { font-family:'Cormorant Garamond',serif; font-style:italic; color:rgba(245,240,232,0.35); font-size:0.9rem; margin-bottom:1.5rem; }
+  .footer-links { display:flex; justify-content:center; gap:2rem; list-style:none; flex-wrap:wrap; margin-bottom:1.5rem; }
+  .footer-links a { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:2px; color:rgba(245,240,232,0.35); text-decoration:none; text-transform:uppercase; cursor:pointer; transition:color 0.3s; }
+  .footer-links a:hover { color:var(--gold); }
+  .footer-copy { font-size:0.75rem; color:rgba(245,240,232,0.2); }
+
+  .fade-in { opacity:0; transform:translateY(22px); transition:opacity 0.8s ease,transform 0.8s ease; }
+  .fade-in.visible { opacity:1; transform:translateY(0); }
+
+  @media(max-width:900px) {
+    .about-strip { grid-template-columns:1fr; }
+    .about-img-wrap { min-height:300px; }
+    .about-text { padding:3rem 2rem; }
+    .food-grid { grid-template-columns:1fr 1fr; }
+    .menu-featured { grid-template-columns:1fr; }
+    .kontakt-grid { grid-template-columns:1fr; }
+    .kontakt-info { padding:3rem 2rem; }
+    .gallery-masonry { columns:2; }
+  }
+  @media(max-width:768px) {
+    .nav-links { display:none; }
+    .hamburger { display:flex; }
+    .hero-title { font-size:3rem; }
+    .form-row { grid-template-columns:1fr; }
+  }
+  @media(max-width:480px) {
+    .food-grid { grid-template-columns:1fr; }
+    .gallery-masonry { columns:1; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo" onclick="showPage('home')">✦ ADC</span>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')">Kryefaqja</a></li>
+    <li><a onclick="showPage('menu')">Menu</a></li>
+    <li><a onclick="showPage('galeria')">Galeria</a></li>
+    <li><a onclick="showPage('rezervim')">Rezervim</a></li>
+    <li><a onclick="showPage('kontakt')">Kontakt</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="showPage('home');toggleMenu()">Kryefaqja</a>
+  <a onclick="showPage('menu');toggleMenu()">Menu</a>
+  <a onclick="showPage('galeria');toggleMenu()">Galeria</a>
+  <a onclick="showPage('rezervim');toggleMenu()">Rezervim</a>
+  <a onclick="showPage('kontakt');toggleMenu()">Kontakt</a>
+</div>
+
+<!-- HOME -->
+<div id="home" class="page active">
+  <section id="home-hero">
+    <img class="hero-img" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1600&q=80&auto=format&fit=crop" alt="Restorant">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-ornament">— ✦ —</span>
+      <h1 class="hero-title">Restoranti<br><em>ADC</em></h1>
+      <p class="hero-subtitle">Kuzhinë Shqiptare · Durrës · Që nga 1998</p>
+      <div class="hero-divider"></div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem;">
+        <a class="btn-primary" onclick="showPage('menu')">Shiko Menunë</a>
+        <a class="btn-outline" onclick="showPage('rezervim')">Rezervo Tavolinë</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="about-strip">
+    <div class="about-img-wrap">
+      <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80&auto=format&fit=crop" alt="Ushqim tradicional">
+    </div>
+    <div class="about-text">
+      <p class="section-label">Rreth nesh</p>
+      <h2 class="section-title">Tradita jonë,<br>tryeza juaj</h2>
+      <div class="gold-rule"></div>
+      <p>Që nga viti 1998, Restoranti ADC ka shërbyer kuzhinën më të mirë shqiptare në zemër të Durrësit. Çdo pjatë gatuar me dashuri, produkte lokale dhe receta familjare të trashëguara brez pas brezi.</p>
+      <p>Vij tek ne për të shijuar shijen e vërtetë të Shqipërisë — ashtu siç e gatuan nënat dhe gjyshet tona.</p>
+      <a class="btn-primary" onclick="showPage('menu')" style="display:inline-block;margin-top:2rem;cursor:pointer;">Zbulo Menunë</a>
+    </div>
+  </div>
+
+  <section class="food-grid-section">
+    <p class="section-label" style="color:rgba(201,168,76,0.7);">Specialitetet tona</p>
+    <h2 class="section-title" style="color:var(--cream);">Nga kuzhina jonë</h2>
+    <div class="gold-rule"></div>
+    <div class="food-grid">
+      <div class="food-cell">
+        <img src="https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&q=80&auto=format&fit=crop" alt="Tavë Kosi">
+        <div class="food-cell-overlay"><span class="food-cell-label">Tavë Kosi</span></div>
+      </div>
+      <div class="food-cell">
+        <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80&auto=format&fit=crop" alt="Qofte tradicionale">
+        <div class="food-cell-overlay"><span class="food-cell-label">Qofte Tradicionale</span></div>
+      </div>
+      <div class="food-cell">
+        <img src="https://images.unsplash.com/photo-1519676867240-f03562e64548?w=600&q=80&auto=format&fit=crop" alt="Baklava">
+        <div class="food-cell-overlay"><span class="food-cell-label">Baklava</span></div>
+      </div>
+      <div class="food-cell">
+        <img src="https://images.unsplash.com/photo-1504544750208-dc0358e63f7f?w=600&q=80&auto=format&fit=crop" alt="Peshk i freskët">
+        <div class="food-cell-overlay"><span class="food-cell-label">Peshk i Freskët</span></div>
+      </div>
+      <div class="food-cell">
+        <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80&auto=format&fit=crop" alt="Sallatë vendase">
+        <div class="food-cell-overlay"><span class="food-cell-label">Sallatë Çoban</span></div>
+      </div>
+      <div class="food-cell">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80&auto=format&fit=crop" alt="Meze shqiptare">
+        <div class="food-cell-overlay"><span class="food-cell-label">Meze Shqiptare</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="quote-banner">
+    <p class="quote-text">"Ushqimi nuk është thjesht ushqim — është histori, dashuri dhe kujtim i çdo familje shqiptare."</p>
+    <span class="quote-author">— Eno Minka, Themeluesi</span>
+  </section>
+
+  <section class="hours-section">
+    <p class="section-label">Oraret</p>
+    <h2 class="section-title">Na vizitoni</h2>
+    <div class="gold-rule"></div>
+    <div class="hours-grid">
+      <div class="hours-card fade-in"><p class="hours-day">E Hënë – E Premte</p><p class="hours-time">11:00 – 23:00</p></div>
+      <div class="hours-card fade-in"><p class="hours-day">E Shtunë – E Diel</p><p class="hours-time">10:00 – 01:00</p></div>
+    </div>
+    <a class="btn-primary" onclick="showPage('rezervim')" style="display:inline-block;margin-top:3rem;cursor:pointer;">Rezervo Tani</a>
+  </section>
+
+  <footer>
+    <div class="footer-logo">✦ ADC</div>
+    <p class="footer-tagline">Kuzhinë Shqiptare që nga viti 1998</p>
+    <ul class="footer-links">
+      <li><a onclick="showPage('home')">Kryefaqja</a></li><li><a onclick="showPage('menu')">Menu</a></li>
+      <li><a onclick="showPage('galeria')">Galeria</a></li><li><a onclick="showPage('rezervim')">Rezervim</a></li>
+      <li><a onclick="showPage('kontakt')">Kontakt</a></li>
+    </ul>
+    <p class="footer-copy">© 2025 Restoranti ADC. Të gjitha të drejtat e rezervuara.</p>
+  </footer>
+</div>
+
+<!-- MENU -->
+<div id="menu" class="page">
+  <div class="page-hero">
+    <img class="page-hero-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=70&auto=format&fit=crop" alt="">
+    <div class="page-hero-content">
+      <p class="page-hero-sub">Kuzhinë Shqiptare</p>
+      <h1 class="page-hero-title">Menu</h1>
+    </div>
+  </div>
+  <div class="menu-tabs">
+    <button class="menu-tab active" onclick="switchMenu('antipastat',this)">Antipastat</button>
+    <button class="menu-tab" onclick="switchMenu('kryesorja',this)">Kryesorja</button>
+    <button class="menu-tab" onclick="switchMenu('peshku',this)">Peshku</button>
+    <button class="menu-tab" onclick="switchMenu('dessert',this)">Ëmbëlsira</button>
+    <button class="menu-tab" onclick="switchMenu('pijet',this)">Pije</button>
+  </div>
+
+  <div class="menu-section active" id="antipastat">
+    <p class="menu-category-title">✦ Antipastat ✦</p>
+    <div class="menu-featured">
+      <div class="menu-featured-img"><img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80&auto=format&fit=crop" alt="Sallatë Çoban"></div>
+      <div class="menu-featured-text"><h3>Sallatë Çoban</h3><p>Domate, tranguj, qepë dhe djathë i bardhë me vaj ulliri ekstra virgin dhe rigon të freskët. Shija e verës shqiptare.</p><span class="price">480 L</span></div>
+    </div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Tarator Shqiptar</h4><p>Kos i freskët me kastravec, hudër, arrë dhe mentë, i shoqëruar me bukë misri.</p></div><span class="menu-item-price">550 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Gjizë e Pjekur</h4><p>Gjizë vendase e pjekur në skarë, me mjaltë dhe arrë, mbi bukë tradicionale.</p></div><span class="menu-item-price">650 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Petulla me Gjizë</h4><p>Petulla tradicionale të freskëta, me gjizë të butë dhe mjaltë mali.</p></div><span class="menu-item-price">500 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Misër i Pjekur</h4><p>Misër i freskët i pjekur në skarë me gjalpë bari dhe kripë deti.</p></div><span class="menu-item-price">420 L</span></div>
+  </div>
+
+  <div class="menu-section" id="kryesorja">
+    <p class="menu-category-title">✦ Kryesorja ✦</p>
+    <div class="menu-featured">
+      <div class="menu-featured-img"><img src="https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&q=80&auto=format&fit=crop" alt="Tavë Kosi"></div>
+      <div class="menu-featured-text"><h3>Tavë Kosi</h3><p>Qengj i pjekur ngadalë me kos dhe vezë, recetë tradicionale e Elbasanit, gatuar 3 orë. Pjata jonë krenare.</p><span class="price">1,400 L</span></div>
+    </div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Fërgesë Tirane</h4><p>Mish viçi me speca, domate dhe djathë të bardhë, i gatuar ngadalë në tenxhere argjile.</p></div><span class="menu-item-price">1,200 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Qofte Fustane</h4><p>Qofte tradicionale të bëra nga mish viçi dhe qengji, me salcë domateje dhe patate.</p></div><span class="menu-item-price">1,100 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Pule e Pjekur në Skarë</h4><p>Gjysmë pule e marinuar me barishte malore, e pjekur mbi qymyr, me patate të pjekura.</p></div><span class="menu-item-price">1,250 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Pastiço Shqiptare</h4><p>Makarona me mish të grirë, kos dhe djathë, e pjekur në furrë sipas recetës tradicionale.</p></div><span class="menu-item-price">950 L</span></div>
+  </div>
+
+  <div class="menu-section" id="peshku">
+    <p class="menu-category-title">✦ Peshku ✦</p>
+    <div class="menu-featured">
+      <div class="menu-featured-img"><img src="https://images.unsplash.com/photo-1504544750208-dc0358e63f7f?w=600&q=80&auto=format&fit=crop" alt="Peshk i pjekur"></div>
+      <div class="menu-featured-text"><h3>Koran i Pjekur</h3><p>Koran i freskët nga Liqeni i Ohrit, i pjekur me vaj ulliri, limon dhe rozmarinë. Specialiteti i detit tonë.</p><span class="price">1,800 L</span></div>
+    </div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Karidhe me Hudër</h4><p>Karidhe të detit Adriatik, i gatuar me gjalpë, hudër të freskët dhe verë të bardhë.</p></div><span class="menu-item-price">1,600 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Krap i Pjekur</h4><p>Krap i freskët nga lumi Mat, i pjekur tërë me barishte dhe patate të ziera.</p></div><span class="menu-item-price">1,400 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Sallatë Deti</h4><p>Mix i freskët i frutave të detit: karidhe, midhje dhe kallamar, me limon dhe kaperi.</p></div><span class="menu-item-price">1,300 L</span></div>
+  </div>
+
+  <div class="menu-section" id="dessert">
+    <p class="menu-category-title">✦ Ëmbëlsira ✦</p>
+    <div class="menu-featured">
+      <div class="menu-featured-img"><img src="https://images.unsplash.com/photo-1519676867240-f03562e64548?w=600&q=80&auto=format&fit=crop" alt="Baklava"></div>
+      <div class="menu-featured-text"><h3>Baklava Tradicionale</h3><p>Shtresa filo me arrë, kanellë dhe sherbet mjalti. Recetë familjare prej 30 vitesh, e bërë çdo ditë me dorë.</p><span class="price">450 L</span></div>
+    </div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Revani</h4><p>Kek i butë bollguri i njomur me sherbet portokalli, garnuar me kokos të thyer.</p></div><span class="menu-item-price">380 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Tulumba</h4><p>Simite të frira në vaj me sherbet mjalti, të ngrohta nga furra. Servohet me akullore vanilje.</p></div><span class="menu-item-price">350 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Shëndetlie</h4><p>Biskota tradicionale me gjalpë, arrë e mjaltë mali, e bërë sipas recetës së Beratit.</p></div><span class="menu-item-price">300 L</span></div>
+  </div>
+
+  <div class="menu-section" id="pijet">
+    <p class="menu-category-title">✦ Pije ✦</p>
+    <div class="menu-item"><div class="menu-item-info"><h4>Raki Shqiptare</h4><p>Raki shtëpie e distiluar vetë, e plakur 2 vjet. Servuar e nxehtë ose e ftohtë.</p></div><span class="menu-item-price">250 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Verë e Kuqe — Çobo</h4><p>Merlot shqiptar nga Kantina Çobo, Berat. Shishja ose gota.</p></div><span class="menu-item-price">350 L / gota</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Verë e Bardhë — Stërmasi</h4><p>Verë e bardhë me shije freskuese, ideale me peshk dhe antipasta.</p></div><span class="menu-item-price">320 L / gota</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Kos i Freskët</h4><p>Kos bari i pastërmuar direkt nga fermeri i Durrësit, servuar me mjaltë.</p></div><span class="menu-item-price">200 L</span></div>
+    <div class="menu-item"><div class="menu-item-info"><h4>Ujë Mineral Tepelena</h4><p>Natyral ose me gaz.</p></div><span class="menu-item-price">150 L</span></div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">✦ ADC</div><p class="footer-tagline">Kuzhinë Shqiptare që nga viti 1998</p>
+    <ul class="footer-links"><li><a onclick="showPage('home')">Kryefaqja</a></li><li><a onclick="showPage('menu')">Menu</a></li><li><a onclick="showPage('galeria')">Galeria</a></li><li><a onclick="showPage('rezervim')">Rezervim</a></li><li><a onclick="showPage('kontakt')">Kontakt</a></li></ul>
+    <p class="footer-copy">© 2025 Restoranti ADC. Të gjitha të drejtat e rezervuara.</p>
+  </footer>
+</div>
+
+<!-- GALERIA -->
+<div id="galeria" class="page">
+  <div class="page-hero">
+    <img class="page-hero-img" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=70&auto=format&fit=crop" alt="">
+    <div class="page-hero-content">
+      <p class="page-hero-sub">Momente & Kujtesa</p>
+      <h1 class="page-hero-title">Galeria</h1>
+    </div>
+  </div>
+  <div style="background:var(--dark);padding:2.5rem 5% 0;text-align:center;">
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(245,240,232,0.45);font-size:1.05rem;max-width:500px;margin:0 auto;">Çdo qoshe e restorantit tonë tregon një histori — e gatimit, e familjes, e traditës shqiptare.</p>
+  </div>
+  <div class="gallery-masonry">
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80&auto=format&fit=crop" alt=""><div class="gallery-overlay"><p class="gallery-caption">Pjata tona krenare</p></div></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80&auto=format&fit=crop" alt=""><div class="gallery-overlay"><p class="gallery-caption">Atmosfera jonë e ngrohtë</p></div></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&q=80&auto=format&fit=crop" alt=""><div class="gallery-overlay"><p class="gallery-caption">Tavë tradicionale</p></div></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80&auto=format&fit=crop" alt=""><div class="gallery-overlay"><p class="gallery-caption">Produkte lokale çdo ditë</p></div></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1504544750208-dc0358e63f7f?w=600&q=80&auto=format&fit=crop" alt=""><div class="gallery-overlay"><p class="gallery-caption">Peshk i freskët Adriatik</p></div></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1519676867240-f03562e64548?w=600&q=80&auto=format&fit=crop" alt=""><div class="gallery-overlay"><p class="gallery-caption">Ëmbëlsira tradicionale</p></div></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80&auto=format&fit=crop" alt=""><div class="gallery-overlay"><p class="gallery-caption">Qofte të freskëta</p></div></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=600&q=80&auto=format&fit=crop" alt=""><div class="gallery-overlay"><p class="gallery-caption">Terraca e jashtme</p></div></div>
+    <div class="gallery-item"><img src="https://images.unsplash.com/photo-1536489885071-87983c3e2859?w=600&q=80&auto=format&fit=crop" alt=""><div class="gallery-overlay"><p class="gallery-caption">Meze për miqtë</p></div></div>
+  </div>
+  <div style="background:var(--dark);padding:3rem 5%;text-align:center;border-top:1px solid var(--border);">
+    <p style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:4px;color:var(--gold);margin-bottom:0.8rem;">NDANI MOMENTIN TUAJ</p>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:rgba(245,240,232,0.55);">Tagjoni <span style="color:var(--gold);">@restoranti_adc</span> në Instagram</p>
+  </div>
+  <footer style="background:var(--dark);">
+    <div class="footer-logo">✦ ADC</div><p class="footer-tagline">Kuzhinë Shqiptare që nga viti 1998</p>
+    <ul class="footer-links"><li><a onclick="showPage('home')">Kryefaqja</a></li><li><a onclick="showPage('menu')">Menu</a></li><li><a onclick="showPage('galeria')">Galeria</a></li><li><a onclick="showPage('rezervim')">Rezervim</a></li><li><a onclick="showPage('kontakt')">Kontakt</a></li></ul>
+    <p class="footer-copy">© 2025 Restoranti ADC. Të gjitha të drejtat e rezervuara.</p>
+  </footer>
+</div>
+
+<!-- REZERVIM -->
+<div id="rezervim" class="page">
+  <div class="page-hero">
+    <img class="page-hero-img" src="https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=1200&q=70&auto=format&fit=crop" alt="">
+    <div class="page-hero-content">
+      <p class="page-hero-sub">Na Vizitoni</p>
+      <h1 class="page-hero-title">Rezervim Tavoline</h1>
+    </div>
+  </div>
+  <div class="rezervim-wrap">
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:var(--text-light);text-align:center;margin-bottom:3rem;line-height:1.85;">Rezervoni tavolinën tuaj dhe sigurohuni që nata juaj të jetë e përsosur. Pranojmë edhe rezervime për ngjarje private dhe dasma.</p>
+    <div class="form-row">
+      <div class="form-group"><label>Emri Juaj *</label><input type="text" id="emri" placeholder="Artan"></div>
+      <div class="form-group"><label>Mbiemri *</label><input type="text" placeholder="Haxhiu"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Telefon *</label><input type="tel" id="tel" placeholder="+355 69 xxx xxxx"></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="artan@email.com"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Data *</label><input type="date" id="data"></div>
+      <div class="form-group"><label>Ora *</label>
+        <select><option value="">Zgjidhni orën</option><option>11:00</option><option>12:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option><option>19:00</option><option>20:00</option><option>21:00</option><option>22:00</option></select>
+      </div>
+    </div>
+    <div class="form-group"><label>Numri i Personave *</label>
+      <select><option value="">Zgjidhni</option><option>1 person</option><option>2 persona</option><option>3 persona</option><option>4 persona</option><option>5–6 persona</option><option>7–10 persona</option><option>Mbi 10 persona (ngjarje)</option></select>
+    </div>
+    <div class="form-group"><label>Zona Preferuese</label>
+      <select><option>Salla kryesore</option><option>Terraca e jashtme</option><option>Kabina private</option><option>Pa preferim</option></select>
+    </div>
+    <div class="form-group"><label>Shënime të Veçanta</label><textarea placeholder="Alergjitë, raste speciale, kërkesa të veçanta..."></textarea></div>
+    <button class="form-submit" onclick="submitForm()">Dërgo Rezervimin</button>
+    <div class="success-msg" id="successMsg">✦ Faleminderit! Rezervimi juaj u dërgua me sukses.<br><span style="font-size:0.85rem;font-family:'Lato',sans-serif;color:var(--text-light);">Do t'ju kontaktojmë brenda 1 ore për konfirmim.</span></div>
+  </div>
+  <footer>
+    <div class="footer-logo">✦ ADC</div><p class="footer-tagline">Kuzhinë Shqiptare që nga viti 1998</p>
+    <ul class="footer-links"><li><a onclick="showPage('home')">Kryefaqja</a></li><li><a onclick="showPage('menu')">Menu</a></li><li><a onclick="showPage('galeria')">Galeria</a></li><li><a onclick="showPage('rezervim')">Rezervim</a></li><li><a onclick="showPage('kontakt')">Kontakt</a></li></ul>
+    <p class="footer-copy">© 2025 Restoranti ADC. Të gjitha të drejtat e rezervuara.</p>
+  </footer>
+</div>
+
+<!-- KONTAKT -->
+<div id="kontakt" class="page">
+  <div class="page-hero">
+    <img class="page-hero-img" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&q=70&auto=format&fit=crop" alt="">
+    <div class="page-hero-content">
+      <p class="page-hero-sub">Na gjeni</p>
+      <h1 class="page-hero-title">Kontakt</h1>
+    </div>
+  </div>
+  <div class="kontakt-grid">
+    <div class="kontakt-info">
+      <p class="section-label">Informacion</p>
+      <h2 class="section-title">Na kontaktoni</h2>
+      <div class="gold-rule"></div>
+      <div class="info-items">
+        <div class="info-item"><span class="info-icon">📍</span><div><h4>Adresa</h4><p>Rruga Dëshmorët e Kombit, Nr. 42<br>Durrës, Shqipëri</p></div></div>
+        <div class="info-item"><span class="info-icon">📞</span><div><h4>Telefon</h4><p>+355 52 xxx xxx<br>+355 69 xxx xxxx</p></div></div>
+        <div class="info-item"><span class="info-icon">✉️</span><div><h4>Email</h4><p>info@restoranti-adc.al</p></div></div>
+        <div class="info-item"><span class="info-icon">🕐</span><div><h4>Oraret</h4><p>E Hënë – E Premte: 11:00 – 23:00<br>E Shtunë – E Diel: 10:00 – 01:00</p></div></div>
+      </div>
+      <div class="social-links">
+        <a class="social-link" href="#">f</a>
+        <a class="social-link" href="#">◎</a>
+        <a class="social-link" href="#">✆</a>
+      </div>
+    </div>
+    <div class="kontakt-map-side">
+      <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=900&q=80&auto=format&fit=crop" alt="Harta">
+      <div class="map-overlay">
+        <p class="map-title">Rruga Dëshmorët e Kombit</p>
+        <p class="map-addr">DURRËS, SHQIPËRI</p>
+        <a href="https://maps.google.com/?q=Durres,Albania" target="_blank" class="btn-primary" style="color:var(--dark);text-decoration:none;font-size:0.65rem;">Hap në Google Maps</a>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-logo">✦ ADC</div><p class="footer-tagline">Kuzhinë Shqiptare që nga viti 1998</p>
+    <ul class="footer-links"><li><a onclick="showPage('home')">Kryefaqja</a></li><li><a onclick="showPage('menu')">Menu</a></li><li><a onclick="showPage('galeria')">Galeria</a></li><li><a onclick="showPage('rezervim')">Rezervim</a></li><li><a onclick="showPage('kontakt')">Kontakt</a></li></ul>
+    <p class="footer-copy">© 2025 Restoranti ADC. Të gjitha të drejtat e rezervuara.</p>
+  </footer>
+</div>
+
+<script>
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+    setTimeout(triggerFadeIns, 150);
+  }
+  function toggleMenu() {
+    document.getElementById('hamburger').classList.toggle('open');
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+  function switchMenu(section, btn) {
+    document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.menu-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById(section).classList.add('active');
+    btn.classList.add('active');
+  }
+  function submitForm() {
+    const emri = document.getElementById('emri').value;
+    const tel = document.getElementById('tel').value;
+    if (!emri || !tel) { alert('Ju lutem plotësoni fushat e detyrueshme.'); return; }
+    document.getElementById('successMsg').style.display = 'block';
+    document.querySelector('.form-submit').style.display = 'none';
+  }
+  function triggerFadeIns() {
+    document.querySelectorAll('.fade-in').forEach((el, i) => setTimeout(() => el.classList.add('visible'), i * 130));
+  }
+  triggerFadeIns();
+  const d = document.getElementById('data');
+  if (d) d.setAttribute('min', new Date().toISOString().split('T')[0]);
+</script>
+</body>
+</html>
